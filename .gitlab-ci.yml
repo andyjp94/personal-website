@@ -16,6 +16,13 @@ Production build:
   stage: build
   script: yarn build
 
+Security test:
+  image: node:10-alpine
+  stage: test
+  script:
+    - yarn install snyk
+    - npx snyk test
+
 Unit Test:
   image: node:10-alpine
   stage: test
