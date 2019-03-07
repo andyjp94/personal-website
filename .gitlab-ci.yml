@@ -31,4 +31,8 @@ Unit Test:
 E2E Test:
   image: node:10-alpine
   stage: test
-  script: yarn test:e2e
+  script:
+    - yarn add global wait-on serve
+    - yarn build
+    - serve dist -l 8080 dist & wait-on http://localhost:8080
+    - cypress run
