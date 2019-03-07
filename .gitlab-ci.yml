@@ -6,11 +6,6 @@ stages:
 before_script:
   - yarn install
 
-View Envs:
-  image: node:10-alpine
-  stage: build
-  script: env | cut -d '=' -f 1
-
 Linting:
   image: node:10-alpine
   stage: build
