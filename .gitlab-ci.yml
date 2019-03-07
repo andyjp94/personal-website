@@ -20,7 +20,7 @@ Security test:
   image: node:10-alpine
   stage: test
   script:
-    - yarn install snyk
+    - yarn add snyk
     - npx snyk test
 
 Unit Test:
