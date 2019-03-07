@@ -40,4 +40,4 @@ E2E Test:
     - yarn global add wait-on serve
     - yarn build
     - serve -l 8080 dist & wait-on http://localhost:8080
-    - cypress run
+    - npx cypress run
