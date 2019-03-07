@@ -1,0 +1,27 @@
+stages:
+  - build
+  - test
+  # - deploy
+
+before_script:
+  - yarn install
+
+Linting:
+  image: node:10-alpine
+  stage: build
+  script: yarn lint --max-warnings 1 # exit code will be non zero if there are any warnings
+
+Production build:
+  image: node:10-alpine
+  stage: build
+  script: yarn build
+
+Unit Test:
+  image: node:10-alpine
+  stage: test
+  script: yarn test:unit
+
+E2E Test:
+  image: node:10-alpine
+  stage: test
+  script: yarn test:e2e
