@@ -29,10 +29,10 @@ Unit Test:
   script: yarn test:unit
 
 E2E Test:
-  image: node:10-alpine
+  image: cypress/browsers:chrome69
   stage: test
   script:
-    - yarn global add wait-on serve cypress
+    - yarn global add wait-on serve
     - yarn build
     - serve -l 8080 dist & wait-on http://localhost:8080
     - cypress run
