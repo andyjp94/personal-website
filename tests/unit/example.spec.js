@@ -1,13 +1,13 @@
-import { expect } from "chai";
-import { shallowMount } from "@vue/test-utils";
-import HelloWorld from "@/components/HelloWorld.vue";
+// import { expect } from "chai";
+// // import { shallowMount } from "@vue/test-utils";
+// import HelloWorld from "@/App.vue";
 
-describe("HelloWorld.vue", () => {
-  it("renders props.msg when passed", () => {
-    const msg = "new message";
-    const wrapper = shallowMount(HelloWorld, {
-      propsData: { msg }
-    });
-    expect(wrapper.text()).to.include(msg);
-  });
-});
+// describe("HelloWorld.vue", () => {
+//   it("sets the correct default data", () => {
+//     expect(HelloWorld.data).to.be.a("function");
+//     const defaultData = HelloWorld.data();
+//     console.log(defaultData);
+
+//     // expect(defaultData.message).toBe("hello!");
+//   });
+// });
