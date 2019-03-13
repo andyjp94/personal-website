@@ -8,13 +8,6 @@ exports.handler = async event => {
         value: "max-age=63072000; includeSubdomains; preload"
       }
     ];
-    headers["content-security-policy"] = [
-      {
-        key: "Content-Security-Policy",
-        value:
-          "default-src 'none'; img-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; object-src 'none'"
-      }
-    ];
     headers["x-content-type-options"] = [
       { key: "X-Content-Type-Options", value: "nosniff" }
     ];
