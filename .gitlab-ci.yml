@@ -22,6 +22,7 @@ before_script:
 Lint terraform:
   stage: lint
   script:
+    - terraform --version
     - terraform init infra
     - terraform validate -var domain_name="andrewjohnperry.com" infra
 
