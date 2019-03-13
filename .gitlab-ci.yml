@@ -33,6 +33,9 @@ Lint Javascript:
   only:
     changes:
       - frontend/**/*
+  except:
+    variables:
+      - $INFRA_CHANGES
   before_script:
     - cd frontend
     - yarn install
@@ -60,6 +63,9 @@ Production build:
   only:
     changes:
       - frontend/**/*
+  except:
+    variables:
+      - $INFRA_CHANGES
   before_script:
     - cd frontend
     - yarn install
@@ -73,6 +79,9 @@ Security test:
   only:
     changes:
       - frontend/**/*
+  except:
+    variables:
+      - $INFRA_CHANGES
   before_script:
     - cd frontend
     - yarn install
@@ -84,6 +93,9 @@ Unit Test:
   only:
     changes:
       - frontend/**/*
+  except:
+    variables:
+      - $INFRA_CHANGES
   before_script:
     - cd frontend
     - yarn install
@@ -99,6 +111,9 @@ E2E Test:
   only:
     changes:
       - frontend/**/*
+  except:
+    variables:
+      - $INFRA_CHANGES
   before_script:
     - cd frontend
     - yarn install
