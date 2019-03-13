@@ -56,11 +56,14 @@ Build Terraform:
   artifacts:
     paths:
       - planfile
+      - .terraform_tmp/headers.zip
 
 Deploy Terraform:
   stage: deploy
   script:
+    - mkdir .terraform_tmp
     - curl --header "PRIVATE-TOKEN:${API_TOKEN}" -o planfile "https://gitlab.com/api/v4/projects/11204815/jobs/${ARTIFACT_JOB_ID}/artifacts/planfile"
+    - curl --header "PRIVATE-TOKEN:${API_TOKEN}" -o .terraform_tmp/headers.zip "https://gitlab.com/api/v4/projects/11204815/jobs/${ARTIFACT_JOB_ID}/artifacts/.terraform_tmp/headers.zip"
     - terraform apply -input=false "planfile"
   when: manual
   only:
