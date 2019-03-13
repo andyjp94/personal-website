@@ -14,4 +14,10 @@ module "website" {
   domain_name    = "${var.domain_name}"
   hosted_zone_id = "${data.aws_route53_zone.self.zone_id}"
   certificate    = "${data.aws_acm_certificate.top_level.arn}"
+
+  lambda = {
+    file_path = "${path.module}/headers.js"
+    hander    = "headers.handler"
+    runtime   = "nodejs8.10"
+  }
 }
