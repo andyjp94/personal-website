@@ -14,12 +14,12 @@ image: hashicorp/terraform:0.11.3
 
 before_script:
   - while read line; do IFS=',' read -ra parts <<< $line; sed "s~\(${parts[0]}?ref=\)~\0${parts[1]}~g" infra/*.tf;   done < infra/terraform_version.cf
-  - init infra
+  - terraform init infra
 
 Lint terraform:
   stage: lint
   script:
-    - validate -var domain_name="andrewjohnperry.com" infra
+    - terraform validate -var domain_name="andrewjohnperry.com" infra
 
 Lint Javascript:
   image: node:10-alpine
