@@ -41,7 +41,7 @@ Lint Javascript:
 Build Terraform:
   stage: build
   script:
-    - result=$(terraform apply -var domain_name="andrewjohnperry.com" -out "planfile" --detailed-exitcode infra)
+    - result=$(terraform plan -var domain_name="andrewjohnperry.com" -out "planfile" --detailed-exitcode infra)
     - if [ "${result}" == "2" ]; then curl -X POST -F token=${TRIGGER_TOKEN} -F "ref=${CI_COMMIT_REF_NAME}" -F "variables[INFRA_CHANGES]=true" https://gitlab.com/api/v4/projects/11204815/trigger/pipeline; fi
   artifacts:
     paths:
