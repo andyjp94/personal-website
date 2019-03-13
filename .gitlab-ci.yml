@@ -18,12 +18,11 @@ image:
 
 before_script:
   - while read line; do repo=$(echo "${line}" | cut -d ',' -f 1); version=$(echo "${line}" | cut -d ',' -f 2); sed -i "s~\(${repo}?ref=\)~\0${version}~g" infra/*.tf; done < infra/terraform_version.cf
-
+  - terraform --version
+  - terraform init infra
 Lint terraform:
   stage: lint
   script:
-    - terraform --version
-    - terraform init infra
     - terraform validate -var domain_name="andrewjohnperry.com" infra
     - terraform fmt -check=true infra
 
