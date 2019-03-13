@@ -59,8 +59,8 @@ Build Terraform:
 
 Deploy Terraform:
   stage: deploy
-  script: 
-    - curl --header "PRIVATE-TOKEN: ${API_TOKEN}" "https://gitlab.com/api/v4/projects/11204815/jobs/${ARTIFACT_JOB_ID}/artifacts/planfile" > planfile
+  script:
+    - curl --header "PRIVATE-TOKEN:${API_TOKEN}" -o planfile "https://gitlab.com/api/v4/projects/11204815/jobs/${ARTIFACT_JOB_ID}/artifacts/planfile"
     - terraform apply -input=false "planfile"
   when: manual
   only:
