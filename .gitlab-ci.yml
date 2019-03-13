@@ -25,7 +25,7 @@ Lint terraform:
     - terraform --version
     - terraform init infra
     - terraform validate -var domain_name="andrewjohnperry.com" infra
-    - terraform fmt infra -check=true
+    - terraform fmt -check=true infra
 
 Lint Javascript:
   image: node:10-alpine
