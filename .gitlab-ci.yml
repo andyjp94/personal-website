@@ -20,7 +20,8 @@ before_script:
   - while read line; do repo=$(echo "${line}" | cut -d ',' -f 1); version=$(echo "${line}" | cut -d ',' -f 2); sed -i "s~\(${repo}?ref=\)~\0${version}~g" infra/*.tf; done < infra/terraform_version.cf
   - terraform --version
   - terraform init infra
-Lint terraform:
+
+Lint Terraform:
   stage: lint
   script:
     - terraform validate -var domain_name="andrewjohnperry.com" infra
@@ -59,7 +60,7 @@ Deploy Terraform:
     variables:
       - $INFRA_CHANGES
 
-Production build:
+Build Javascript:
   image: node:10-alpine
   stage: build
   script: yarn build
