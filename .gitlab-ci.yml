@@ -17,7 +17,7 @@ image:
     - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
 before_script:
-  - while read line; do IFS=',' read -ra parts <<< $line; sed "s~\(${parts[0]}?ref=\)~\0${parts[1]}~g" infra/*.tf;   done < infra/terraform_version.cf
+  - while read line; do parts=$(awk -F',' '{print $1 $2 }'); sed "s~\(${parts[0]}?ref=\)~\0${parts[1]}~g" infra/main.tf;   done < infra/terraform_version.cf
   - terraform init infra
 
 Lint terraform:
