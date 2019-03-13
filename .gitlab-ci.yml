@@ -1,4 +1,5 @@
 stages:
+  - lint
   - build
   - test
   # - deploy
@@ -6,20 +7,42 @@ stages:
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-  - node_modules/
+  - frontend/node_modules/
+  - infra/.terraform
 
-before_script:
-  - yarn install
+- before_script:
+  # This command automatically fills in the version number for the modules as its nasty to embed them in the module source
+  - while read line; do IFS=',' read -ra parts <<< $line; sed "s~\(${parts[0]}?ref=\)~\0${parts[1]}~g" infra/*.tf;   done < infra/terraform_version.cf
+  - terraform init infra
 
-Linting:
+Lint terraform:
+  image: hashicorp/terraform:0.11.3
+  stage: lint
+  script:
+    - init infra 
+    - validate -var domain_name="andrewjohnperry.com" infra
+
+Lint Javascript:
   image: node:10-alpine
-  stage: build
+  stage: lint
   script: yarn lint --max-warnings 1 # exit code will be non zero if there are any warnings
+  only:
+    changes:
+      - frontend/**/*
+  before_script:
+    - cd frontend
+    - yarn install
 
 Production build:
   image: node:10-alpine
   stage: build
   script: yarn build
+  only:
+    changes:
+      - frontend/**/*
+  before_script:
+    - cd frontend
+    - yarn install
 
 Security test:
   image: node:10-alpine
@@ -27,11 +50,23 @@ Security test:
   script:
     - yarn add snyk
     - npx snyk test
+  only:
+    changes:
+      - frontend/**/*
+  before_script:
+    - cd frontend
+    - yarn install
 
 Unit Test:
   image: node:10-alpine
   stage: test
   script: yarn test:unit
+  only:
+    changes:
+      - frontend/**/*
+  before_script:
+    - cd frontend
+    - yarn install
 
 E2E Test:
   image: cypress/browsers:chrome69
@@ -41,3 +76,9 @@ E2E Test:
     - yarn build
     - serve -l 8080 dist & wait-on http://localhost:8080
     - npx cypress run
+  only:
+    changes:
+      - frontend/**/*
+  before_script:
+    - cd frontend
+    - yarn install

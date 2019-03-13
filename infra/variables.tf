@@ -3,11 +3,6 @@ variable "domain_name" {
   description = "The domain name for the website."
 }
 
-variable "ref" {
-  type        = "string"
-  description = "The version of the terraform module that should be used."
-}
-
 variable "certificate_name" {
   type        = "string"
   default     = "andrewjohnperry.com"
