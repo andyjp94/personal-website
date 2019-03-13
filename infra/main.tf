@@ -17,7 +17,7 @@ module "website" {
 
   lambda = {
     file_path = "${path.module}/headers.js"
-    handler    = "headers.handler"
+    handler   = "headers.handler"
     runtime   = "nodejs8.10"
   }
 }
