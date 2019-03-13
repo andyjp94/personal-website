@@ -53,7 +53,7 @@ Deploy Terraform:
   when: manual
   only:
     variables:
-      - ${INFRA_CHANGES}
+      - $INFRA_CHANGES
 
 Production build:
   image: node:10-alpine
