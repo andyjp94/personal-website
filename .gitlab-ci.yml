@@ -10,16 +10,15 @@ cache:
   - frontend/node_modules/
   - infra/.terraform
 
-- before_script:
-  # This command automatically fills in the version number for the modules as its nasty to embed them in the module source
+image: hashicorp/terraform:0.11.3
+
+before_script:
   - while read line; do IFS=',' read -ra parts <<< $line; sed "s~\(${parts[0]}?ref=\)~\0${parts[1]}~g" infra/*.tf;   done < infra/terraform_version.cf
-  - terraform init infra
+  - init infra
 
 Lint terraform:
-  image: hashicorp/terraform:0.11.3
   stage: lint
   script:
-    - init infra 
     - validate -var domain_name="andrewjohnperry.com" infra
 
 Lint Javascript:
