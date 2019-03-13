@@ -49,7 +49,7 @@ Build Terraform:
   script:
     - terraform plan -var domain_name="andrewjohnperry.com" -out "planfile" --detailed-exitcode infra || EXIT_CODE=$?
     - if [ "${EXIT_CODE}" != "2" ]; then exit ${EXIT_CODE};fi
-    - curl -X POST -F token=${TRIGGER_TOKEN} -F "ref=${CI_COMMIT_REF_NAME}" -F "variables[INFRA_CHANGES]=true" https://gitlab.com/api/v4/projects/11204815/trigger/pipeline
+    - curl -X POST -F token=${TRIGGER_TOKEN} -F "ref=${CI_COMMIT_REF_NAME}" -F "variables[ARTIFACT_JOB_ID]=${CI_JOB_ID}" -F "variables[INFRA_CHANGES]=true" https://gitlab.com/api/v4/projects/11204815/trigger/pipeline
   except:
     variables:
       - $INFRA_CHANGES
@@ -59,7 +59,9 @@ Build Terraform:
 
 Deploy Terraform:
   stage: deploy
-  script: terraform apply -input=false "planfile"
+  script: 
+    - curl --header "PRIVATE-TOKEN: ${API_TOKEN}" "https://gitlab.com/api/v4/projects/11204815/jobs/${ARTIFACT_JOB_ID}/artifacts/planfile" > planfile
+    - terraform apply -input=false "planfile"
   when: manual
   only:
     variables:
