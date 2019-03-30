@@ -10,9 +10,14 @@ data "aws_route53_zone" "self" {
 }
 
 module "website" {
-  source         = "github.com/andyjp94/website-infra.git"
-  version        = "${var.ref}"
+  source         = "github.com/andyjp94/website-infra.git?ref="
   domain_name    = "${var.domain_name}"
   hosted_zone_id = "${data.aws_route53_zone.self.zone_id}"
   certificate    = "${data.aws_acm_certificate.top_level.arn}"
+
+  lambda = {
+    file_path = "${path.module}/headers.js"
+    handler   = "headers.handler"
+    runtime   = "nodejs8.10"
+  }
 }

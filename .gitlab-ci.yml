@@ -1,25 +1,88 @@
 stages:
+  - lint
   - build
   - test
-  # - deploy
+  - deploy
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-  - node_modules/
+  - frontend/node_modules/
+  - infra/.terraform
+
+image: 
+  name: hashicorp/terraform:0.11.13
+  entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
 before_script:
-  - yarn install
+  - while read line; do repo=$(echo "${line}" | cut -d ',' -f 1); version=$(echo "${line}" | cut -d ',' -f 2); sed -i "s~\(${repo}?ref=\)~\0${version}~g" infra/*.tf; done < infra/terraform_version.cf
+  - terraform --version
+  - terraform init infra
 
-Linting:
+Lint Terraform:
+  stage: lint
+  script:
+    - terraform validate -var domain_name="andrewjohnperry.com" infra
+    - terraform fmt -check=true infra
+  except:
+    variables:
+      - $INFRA_CHANGES
+
+Lint Javascript:
   image: node:10-alpine
-  stage: build
+  stage: lint
   script: yarn lint --max-warnings 1 # exit code will be non zero if there are any warnings
+  only:
+    changes:
+      - frontend/**/*
+  except:
+    variables:
+      - $INFRA_CHANGES
+  before_script:
+    - cd frontend
+    - yarn install
 
-Production build:
+Build Terraform:
+  stage: build
+  script:
+    - terraform plan -var domain_name="andrewjohnperry.com" -out "planfile" --detailed-exitcode infra || EXIT_CODE=$?
+    - if [ "${EXIT_CODE}" != "2" ]; then exit ${EXIT_CODE};fi
+    - curl -X POST -F token=${TRIGGER_TOKEN} -F "ref=${CI_COMMIT_REF_NAME}" -F "variables[ARTIFACT_JOB_ID]=${CI_JOB_ID}" -F "variables[INFRA_CHANGES]=true" https://gitlab.com/api/v4/projects/11204815/trigger/pipeline
+  except:
+    variables:
+      - $INFRA_CHANGES
+  artifacts:
+    paths:
+      - planfile
+      - .terraform_tmp/headers.zip
+
+Deploy Terraform:
+  stage: deploy
+  script:
+    - mkdir .terraform_tmp
+    - curl --header "PRIVATE-TOKEN:${API_TOKEN}" -o planfile "https://gitlab.com/api/v4/projects/11204815/jobs/${ARTIFACT_JOB_ID}/artifacts/planfile"
+    - curl --header "PRIVATE-TOKEN:${API_TOKEN}" -o .terraform_tmp/headers.zip "https://gitlab.com/api/v4/projects/11204815/jobs/${ARTIFACT_JOB_ID}/artifacts/.terraform_tmp/headers.zip"
+    - terraform apply -input=false "planfile"
+  when: manual
+  only:
+    variables:
+      - $INFRA_CHANGES
+
+Build Javascript:
   image: node:10-alpine
   stage: build
   script: yarn build
+  only:
+    changes:
+      - frontend/**/*
+  except:
+    variables:
+      - $INFRA_CHANGES
+  before_script:
+    - cd frontend
+    - yarn install
 
 Security test:
   image: node:10-alpine
@@ -27,11 +90,29 @@ Security test:
   script:
     - yarn add snyk
     - npx snyk test
+  only:
+    changes:
+      - frontend/**/*
+  except:
+    variables:
+      - $INFRA_CHANGES
+  before_script:
+    - cd frontend
+    - yarn install
 
 Unit Test:
   image: node:10-alpine
   stage: test
   script: yarn test:unit
+  only:
+    changes:
+      - frontend/**/*
+  except:
+    variables:
+      - $INFRA_CHANGES
+  before_script:
+    - cd frontend
+    - yarn install
 
 E2E Test:
   image: cypress/browsers:chrome69
@@ -41,3 +122,12 @@ E2E Test:
     - yarn build
     - serve -l 8080 dist & wait-on http://localhost:8080
     - npx cypress run
+  only:
+    changes:
+      - frontend/**/*
+  except:
+    variables:
+      - $INFRA_CHANGES
+  before_script:
+    - cd frontend
+    - yarn install
